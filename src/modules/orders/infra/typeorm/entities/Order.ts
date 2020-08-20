@@ -3,6 +3,7 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  Column,
   ManyToOne,
   JoinColumn,
   OneToMany,
@@ -11,15 +12,30 @@ import {
 import Customer from '@modules/customers/infra/typeorm/entities/Customer';
 import OrdersProducts from '@modules/orders/infra/typeorm/entities/OrdersProducts';
 
+@Entity('orders')
 class Order {
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @ManyToOne(type => Customer, {
+    eager: true,
+  })
+  @JoinColumn({ name: 'customer_id', referencedColumnName: 'id' })
   customer: Customer;
 
+  @Column()
+  customer_id: string;
+
+  @OneToMany(type => OrdersProducts, orderProducts => orderProducts.order, {
+    cascade: ['insert'],
+    eager: true,
+  })
   order_products: OrdersProducts[];
 
+  @CreateDateColumn()
   created_at: Date;
 
+  @UpdateDateColumn()
   updated_at: Date;
 }
 
